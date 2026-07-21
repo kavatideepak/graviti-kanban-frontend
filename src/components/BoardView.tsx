@@ -23,9 +23,22 @@ function group(columns: Column[], tickets: Ticket[]): Grouped {
   return g;
 }
 
+// Include every field the card renders (not just position), so an edit to
+// priority / title / assignee / labels / due date re-syncs the board — not only moves.
 function signature(tickets: Ticket[]): string {
   return tickets
-    .map((t) => `${t.id}:${t.columnId}:${t.position}`)
+    .map((t) =>
+      [
+        t.id,
+        t.columnId,
+        t.position,
+        t.priority,
+        t.title,
+        t.assignee?.id ?? t.assigneeId ?? '',
+        t.dueDate ?? '',
+        (t.Labels ?? []).map((l) => `${l.id}:${l.color}:${l.name}`).join(','),
+      ].join('~'),
+    )
     .sort()
     .join('|');
 }
